@@ -13,11 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Install the github_changelog_generator gem locally
+      # Step 2: Install the github_changelog_generator gem and update the PATH
       - name: Install github_changelog_generator locally
         run: |
           gem install --user-install github_changelog_generator
           echo "$HOME/.gem/ruby/3.0.0/bin" >> $GITHUB_PATH
+
+      # Debugging Step: Print the PATH to ensure it's set correctly
+      - name: Check PATH
+        run: |
+          echo $PATH
+          ls -l $HOME/.gem/ruby/3.0.0/bin
 
       # Step 3: Generate CHANGELOG.md
       - name: Generate CHANGELOG.md
