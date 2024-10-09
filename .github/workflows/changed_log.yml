@@ -13,19 +13,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Install the github_changelog_generator gem and update the PATH
-      - name: Install github_changelog_generator locally
+      # Step 2: Install the github_changelog_generator gem
+      - name: Install github_changelog_generator
         run: |
           gem install --user-install github_changelog_generator
-          echo "$HOME/.gem/ruby/3.0.0/bin" >> $GITHUB_PATH
+          echo "$HOME/.gem/ruby/3.0.0/bin" >> $GITHUB_PATH  # Add the gem path to GITHUB_PATH
 
-      # Debugging Step: Print the PATH to ensure it's set correctly
-      - name: Check PATH
+      # Step 3: Verify installation of github_changelog_generator
+      - name: Verify Installation
         run: |
-          echo $PATH
-          ls -l $HOME/.gem/ruby/3.0.0/bin
+          echo "Current PATH: $PATH"
+          ls -la $HOME/.gem/ruby/3.0.0/bin || echo "Directory does not exist."
+          # Check for the gem command
+          if command -v github_changelog_generator > /dev/null; then
+            echo "github_changelog_generator found."
+          else
+            echo "github_changelog_generator not found."
+          fi
 
-      # Step 3: Generate CHANGELOG.md
+      # Step 4: Generate CHANGELOG.md
       - name: Generate CHANGELOG.md
         run: |
           github_changelog_generator \
@@ -33,7 +39,7 @@ jobs:
             --project ${{ github.event.repository.name }} \
             --token ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 4: Commit and push the updated CHANGELOG.md using the GitHub Actions bot
+      # Step 5: Commit and push the updated CHANGELOG.md using the GitHub Actions bot
       - name: Commit and push CHANGELOG.md
         run: |
           git config --global user.email "action@github.com"
